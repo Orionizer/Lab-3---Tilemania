@@ -6,10 +6,12 @@ public class PlayerMovement : MonoBehaviour
 {
     Vector2 moveInput;
     Rigidbody2D playerRigidBody;
+    Animator playerAnimator;
     [SerializeField] float moveSpeed = 5f;
     void Start()
     {
         playerRigidBody = GetComponent<Rigidbody2D>();
+        playerAnimator = GetComponent<Animator>();
     }
 
     void Update()
@@ -34,6 +36,11 @@ public class PlayerMovement : MonoBehaviour
         if (Mathf.Abs(moveInput.x) > Mathf.Epsilon)
         {
             transform.localScale = new Vector2(Mathf.Sign(playerRigidBody.linearVelocity.x), 1f);
+            playerAnimator.SetBool("isRunning", true);
+        }
+        else
+        {
+            playerAnimator.SetBool("isRunning", false);
         }
     }
 }
