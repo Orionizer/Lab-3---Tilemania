@@ -13,6 +13,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float moveSpeed = 5f;
     [SerializeField] float jumpSpeed = 5f;
     [SerializeField] float climbSpeed = 5f;
+    [SerializeField] float bounceSpeed = 10f;
     [SerializeField] Vector2 deathSpeed = new Vector2(10f, 20f);
 
     bool isAlive = true;
@@ -49,11 +50,20 @@ public class PlayerMovement : MonoBehaviour
     {
         if (!playerBoxCollider.IsTouchingLayers(LayerMask.GetMask("Ground"))) 
         {
+            playerAnimator.SetBool("isBounceJumping", false);
             return;
         }
         if (value.isPressed)
         {
-            playerRigidbody.linearVelocity += new Vector2(0f, jumpSpeed);
+            if (playerCapsuleCollider.IsTouchingLayers(LayerMask.GetMask("Bounce")))
+            {
+                playerRigidbody.linearVelocity += new Vector2(0f, bounceSpeed);
+                playerAnimator.SetBool("isBounceJumping", true);
+            }
+            else
+            {
+                playerRigidbody.linearVelocity += new Vector2(0f, jumpSpeed);
+            }
         }
     }
 
@@ -67,7 +77,14 @@ public class PlayerMovement : MonoBehaviour
     {
         if (Mathf.Abs(moveInput.x) > Mathf.Epsilon)
         {
-            transform.localScale = new Vector2(Mathf.Sign(playerRigidbody.linearVelocity.x), 1f);
+            if(playerAnimator.GetBool("isBounceJumping") == true)
+            {
+                transform.localScale = new Vector2(-(Mathf.Sign(playerRigidbody.linearVelocity.x)), 1f);
+            }
+            else
+            {
+                transform.localScale = new Vector2(Mathf.Sign(playerRigidbody.linearVelocity.x), 1f);
+            }
             playerAnimator.SetBool("isRunning", true);
         }
         else
